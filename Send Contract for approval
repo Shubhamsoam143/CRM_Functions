@@ -1,0 +1,61 @@
+void automation.send_contract_forApproval(Int dealId)
+{
+deal = zoho.crm.getRecordById("Deals",dealId);
+if(deal == null)
+{
+	info "Deal record not found: " + dealId;
+	return;
+}
+dealName = ifNull(deal.get("Deal_Name"),"");
+contactName = ifNull(deal.getJSON("Contact_Name").get("name"),"");
+monthlyCost = ifNull(deal.get("Monthly_Cost"),"");
+mergeFields = Map();
+mergeFields.put("Contact_Name",contactName);
+mergeFields.put("Monthly_Cost",monthlyCost);
+mergeFields.put("id",dealId.toString());
+mergeDataMap = Map();
+mergeDataMap.put("data",mergeFields);
+approverList = List();
+approver = Map();
+approver.put("recipient_name","Hardy");
+approver.put("recipient_email","hardy@alyne.io");
+approver.put("action_type","approve");
+approver.put("signing_order","1");
+approver.put("language","en");
+approverList.add(approver);
+payload = Map();
+payload.put("merge_data",mergeDataMap);
+payload.put("service_name","zohosign");
+payload.put("signer_data",approverList);
+payload.put("sign_in_order",true);
+payload.put("subject","Contract Approval – " + dealName);
+payload.put("filename","Contract_Approval_" + dealName);
+payload.put("reminder_period","7");
+payload.put("set_expire","15");
+// ---------- 6) Call Zoho Writer Merge + Sign ----------
+resp = invokeurl
+[
+	url :"https://www.zohoapis.com/writer/api/v1/documents/7nddfa4ad314649c042c293ab0937ef5089c8/merge/sign"
+	type :POST
+	parameters:payload
+	connection:"zohocontracts"
+];
+info "Writer merge/sign response: " + resp;
+signReqId = "";
+if(resp != null && resp.get("records") != null && resp.get("records").size() > 0)
+{
+	signReqId = ifNull(resp.get("records").get(0).get("sign_request_id"),"");
+}
+if(signReqId != "")
+{
+	upd = Map();
+	upd.put("Sign_Request_ID",signReqId);
+	rec_update = zoho.crm.updateRecord("Deals",dealId,upd);
+	info "rec_update---> " + rec_update;
+	info "Stored Sign_Request_ID on Deal: " + signReqId;
+}
+else
+{
+	info "No sign_request_id returned. Please check Writer/Sign response.";
+}
+}
