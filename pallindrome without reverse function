@@ -1,0 +1,14 @@
+a = "shubham";
+c = a.toList("");
+b = length(a);
+info b;
+count = 1;
+e = "";
+for each i in c
+{
+	d = c.get(b-count);
+	e = e+d;
+	count+=1;
+	info d;
+}
+info e;
