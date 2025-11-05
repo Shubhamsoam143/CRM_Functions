@@ -1,0 +1,61 @@
+response = invokeurl
+[
+	url :"https://recruit.zoho.com/recruit/v2/Applications/" + id
+	type :GET
+	connection:"zoho_recruit"
+];
+// info response;
+response_data = response.getJSON("data").get(0);
+info response_data;
+//  Get data
+candidate_name = response_data.get("Full_Name");
+info candidate_name;
+candidateEmail = response_data.get("Email");
+info candidateEmail;
+jobOpening = response_data.get("Posting_Title");
+startTime = response_data.get("Round_1_Date_Time1");
+info startTime;
+// Parse into datetime object (Deluge understands ISO format)
+dtObj = startTime.toDateTime("yyyy-MM-dd'T'HH:mm:ss");
+info dtObj;
+// Add 10 hours 30 minutes to convert from -05:00 to IST
+// dtObjIST = dtObj.addHour(10).addMinutes(30);
+// Format into desired style
+formattedDate = dtObj.toString("MMM dd, yyyy hh:mm a");
+// Output
+info formattedDate;
+// Example: "Aug 15, 2025 09:00 PM"
+// Create the meeting using the Zoho Meeting API
+zsoid = "875960033";
+sessionMap = Map();
+sessionMap.put("topic","Technical Round 1 with " + candidate_name + " for " + jobOpening + " Position");
+sessionMap.put("presenter",877645029);
+sessionMap.put("startTime",formattedDate);
+sessionMap.put("duration",3600000);
+// in milliseconds
+sessionMap.put("timezone","Asia/Calcutta");
+// Add participants
+participantList = List();
+participantMap = Map();
+participantMap.put("email",candidateEmail);
+participantList.add(participantMap);
+sessionMap.put("participants",participantList);
+// Wrap in main payload
+payload = Map();
+payload.put("session",sessionMap);
+// API URL
+url = "https://meeting.zoho.com/api/v2/" + zsoid + "/sessions.json";
+// Headers
+headers = Map();
+headers.put("Content-Type","application/json;charset=UTF-8");
+// Make POST request
+response = invokeurl
+[
+	url :url
+	type :POST
+	parameters:payload.toString()
+	headers:headers
+	connection:"zoho_meeting"
+];
+// Log the API response
+info response;
