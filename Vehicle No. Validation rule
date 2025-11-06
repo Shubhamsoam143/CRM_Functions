@@ -1,0 +1,16 @@
+map validation_rule.Vehicle360_Registration_Number(String crmAPIRequest)
+{
+entityMap = crmAPIRequest.toMap().get("record");
+response = Map();
+Registration_Number_var = ifnull(entityMap.get("Registration_Number"),"");
+if(!Registration_Number_var.matches("^[A-Za-z0-9/]+$"))
+{
+	response.put('status','error');
+	response.put("message","Invalid Entry: Please enter Alpha-numeric values only");
+}
+else
+{
+	response.put('status','success');
+}
+return response;
+}
