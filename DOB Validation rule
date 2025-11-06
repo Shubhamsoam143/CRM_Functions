@@ -1,0 +1,16 @@
+map validation_rule.DateOfBirth_Customer360(String crmAPIRequest)
+{
+entityMap = crmAPIRequest.toMap().get("record");
+response = Map();
+Date_of_Birth = ifnull(entityMap.get("Date_of_Birth"),"");
+if(Date_of_Birth != "" && Date_of_Birth.toDate() >= zoho.currentdate)
+{
+	response.put('status','error');
+	response.put("message","Please Select Past date ");
+}
+else
+{
+	response.put('status','success');
+}
+return response;
+}
