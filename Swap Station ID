@@ -1,0 +1,16 @@
+map validation_rule.Validate_Latitude_Field(String crmAPIRequest)
+{
+entityMap = crmAPIRequest.toMap().get("record");
+response = Map();
+SRE_STATION_ID_VAR = ifnull(entityMap.get("SRE_STATION_ID"),"");
+if(!SRE_STATION_ID_VAR.matches("^[A-Za-z0-9\/-]+$"))
+{
+	response.put('status','error');
+	response.put('message','Invalid input: Special Charaters not allowed Except - and _');
+}
+else
+{
+	response.put('status','success');
+}
+return response;
+}
