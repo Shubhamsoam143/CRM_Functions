@@ -1,0 +1,16 @@
+map validation_rule.Name_EnergyAgent(String crmAPIRequest)
+{
+entityMap = crmAPIRequest.toMap().get("record");
+response = Map();
+NameData = ifnull(entityMap.get("Name"),"");
+if(!NameData.matches("^[A-Za-z ]+$"))
+{
+	response.put('status','error');
+	response.put("message","Invalid Entry: Please enter Alphabetics only");
+}
+else
+{
+	response.put('status','success');
+}
+return response;
+}
