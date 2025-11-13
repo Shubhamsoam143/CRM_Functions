@@ -1,0 +1,36 @@
+studentList=[{"name":"test1","age":30},{"name":"test2","age":20},{"name":"test3","age":21},{"name":"test4","age":32}];
+
+sortedList = List();
+
+for each dummy in studentList
+{
+    minRecord = null;
+
+    for each rec in studentList
+    {
+        alreadyAdded = false;
+        for each added in sortedList
+        {
+            if(added.get("name") == rec.get("name"))
+            {
+                alreadyAdded = true;
+                break;
+            }
+        }
+
+        if(!alreadyAdded)
+        {
+            if(minRecord == null || rec.get("age") < minRecord.get("age"))
+            {
+                minRecord = rec;
+            }
+        }
+    }
+
+    if(minRecord != null)
+    {
+        sortedList.add(minRecord);
+    }
+}
+
+info sortedList;
